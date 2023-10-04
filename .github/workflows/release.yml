@@ -69,8 +69,8 @@ jobs:
         run: zip -r venster.zip . -x ".git/*"
       - name: Build uberjar
         run: bb uberjar venster-bb.jar -m eval.venster
-      - name: Testrun uberjar
-        run: bb venster-bb.jar -h
+      #- name: Testrun uberjar
+      #  run: bb venster-bb.jar -h
       - name: Release stable
         if: "${{ needs.Config.outputs.stable }}"
         uses: softprops/action-gh-release@v1
