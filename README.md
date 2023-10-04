@@ -1,6 +1,6 @@
 # Venster
 
-CLI written in [Babashka](https://babashka.org/) to render the Links-section of a README.md in your terminal. Templating is supported to allow for contextualized links.
+A [Babashka](https://babashka.org/) CLI to render the Links-section of a README.md in your terminal to make them conveniently clickable. Templating is supported to allow for contextualized links.
 
 <img width="574" alt="Screenshot 2023-10-04 at 14 26 22" src="https://github.com/eval/venster/assets/290596/18ee6c58-529f-4202-8d51-f871a499be66">
 
