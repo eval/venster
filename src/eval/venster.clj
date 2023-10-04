@@ -93,22 +93,26 @@
 (defn- git [& args]
   (some-> (apply process "git" args) :out slurp string/trimr))
 
+(defn- readme-folder []
+  (some-> (find-up "README.md") fs/parent))
+
 (defn- current-branch []
   (git "branch" "--show-current"))
 
-(defn- gh-handle []
-  (or (System/getenv "VENSTER_GH_HANDLE") (git "config" "--get" "github.user")))
+(defn- github-user []
+  (or (System/getenv "VENSTER_GITHUB_USER") (git "config" "--get" "github.user")))
 
-(defn- gl-handle []
-  (or (System/getenv "VENSTER_GL_HANDLE") (git "config" "--get" "gitlab.user")))
+(defn- gitlab-user []
+  (or (System/getenv "VENSTER_GITLAB_USER") (git "config" "--get" "gitlab.user")))
 
 (defn- shell-env []
   (into {} (System/getenv)))
 
-(def ^:private variables {:branch    #'current-branch
-                          :gh-handle #'gh-handle
-                          :gl-handle #'gl-handle
-                          :env       #'shell-env})
+(def ^:private variables {:current-branch #'current-branch
+                          :github-user    #'github-user
+                          :gitlab-user    #'gitlab-user
+                          :env            #'shell-env
+                          :readme-folder  #'readme-folder})
 
 (defn- warn-on-unknown-variables! [tpl ks]
   (let [tpl-vars (selmer/known-variables tpl)]
@@ -135,8 +139,4 @@
 
 (comment
 
-  (def readme (find-up "README.md"))
-
-  (apply max (map count (string/split-lines
-               (extract-links-section (fs/file readme)))))
   #_:end)
