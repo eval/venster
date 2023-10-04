@@ -1,5 +1,5 @@
-(ns eval.links
-  {:clj-kondo/config '{:lint-as {eval.links/when-seq clojure.core/when-some}}}
+(ns eval.venster
+  {:clj-kondo/config '{:lint-as {eval.venster/when-seq clojure.core/when-some}}}
   (:require [babashka.fs :as fs]
             [babashka.process :refer [pipeline pb process]]
             [clojure.java.io :as io]
@@ -95,10 +95,10 @@
   (git "branch" "--show-current"))
 
 (defn- gh-handle []
-  (or (System/getenv "LINKS_GH_HANDLE") (git "config" "--get" "github.user")))
+  (or (System/getenv "VENSTER_GH_HANDLE") (git "config" "--get" "github.user")))
 
 (defn- gl-handle []
-  (or (System/getenv "LINKS_GL_HANDLE") (git "config" "--get" "gitlab.user")))
+  (or (System/getenv "VENSTER_GL_HANDLE") (git "config" "--get" "gitlab.user")))
 
 (def ^:private variables {:branch    #'current-branch
                           :gh-handle #'gh-handle
