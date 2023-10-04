@@ -56,7 +56,7 @@ $ bbin install https://github.com/eval/venster/releases/download/stable/venster-
        Add via `git config --global gitlab.user eval`
    - `readme-folder`  
      Folder where `README.md` is located. Allows for pointing to project-files,  
-     e.g. `file://{{ readme-folder }}/.github/workflows/ci.yml`.  
+     e.g. `{{ readme-folder }}/.github/workflows/ci.yml`.  
 1. Invoking `venster` in any subfolder of the project will now render the links.
 
 ### Example
@@ -76,7 +76,7 @@ Example Links-section in a `README.md` (see also the Links-section of this READM
 ### Builds
 
 - [Builds current branch](https://github.com/eval/venster/actions?query=branch%3A{{ current-branch | default:"main" }})
-- [Release workflow     ](file://{{ readme-folder }}/.github/workflows/release.yml)
+- [Release workflow     ]({{ readme-folder }}/.github/workflows/release.yml)
 
 ### API Docs
 
@@ -110,7 +110,7 @@ $ venster-dev
 ### Builds
 
 - [Builds current branch](https://github.com/eval/venster/actions?query=branch%3A{{ current-branch | default:"main" }})
-- [Release workflow     ](file://{{ readme-folder }}/.github/workflows/release.yml)
+- [Release workflow     ]({{ readme-folder }}/.github/workflows/release.yml)
 
 
 ### Releasing

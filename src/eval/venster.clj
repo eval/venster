@@ -97,7 +97,7 @@
   (some-> (apply process "git" args) :out slurp string/trimr))
 
 (defn- readme-folder []
-  (some-> (find-up "README.md") fs/parent))
+  (some->> (find-up "README.md") fs/parent (str "file://")))
 
 (defn- current-branch []
   (git "branch" "--show-current"))
