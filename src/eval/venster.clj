@@ -78,13 +78,15 @@
        io/reader
        line-seq
        (reduce (fn [{:keys [_result in-section?] :as acc} line]
-                 (if in-section?
-                   (if (re-find #"^#+" line)
-                     (assoc acc :in-section? false)
-                     (update acc :result conj line))
-                   (if (re-find #"^#+ Links" line)
-                     (assoc acc :in-section? true :result ["# Links"])
-                     acc))) {:result [] :in-section? false})
+                 (let [section-ending? #(some->> %1 (re-find #"^(#+) ") second count (= %2))
+                       section-starting? #(some->> % (re-find #"^(#+) Links") second count)]
+                   (if in-section?
+                     (if (section-ending? line in-section?)
+                       (assoc acc :in-section? false)
+                       (update acc :result conj line))
+                     (if-let [depth (section-starting? line)]
+                       (assoc acc :in-section? depth :result ["# Links"])
+                       acc)))) {:result [] :in-section? false})
        :result
        (string/join \newline)))
 
@@ -117,16 +119,20 @@
 (defn -main [& _args]
   (if-some [readme (some-> (find-up "README.md") fs/file)]
     (when-seq [links-section (extract-links-section readme)]
-      (let [ctx-map (context-map links-section variables)]
-        (warn-on-unknown-variables! links-section (keys variables))
-        (let [links (selmer/render links-section ctx-map)]
-          (pipeline (pb "echo" links)
-                    (pb {:out :inherit}
-                        "bat" "-l" "md" "--style=plain,header-filename" "--file-name" readme)))))
+              (let [max-line-length (apply max (map count (string/split-lines links-section)))
+                    ctx-map         (context-map links-section variables)]
+                (warn-on-unknown-variables! links-section (keys variables))
+                (let [links (selmer/render links-section ctx-map)]
+                  (pipeline (pb "echo" links)
+                            (pb {:out :inherit}
+                                "glow" "-w" max-line-length)))))
     (do (println "Could not find any README.md traversing up")
         (System/exit 1))))
 
 (comment
 
+  (def readme (find-up "README.md"))
 
+  (apply max (map count (string/split-lines
+               (extract-links-section (fs/file readme)))))
   #_:end)
