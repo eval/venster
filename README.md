@@ -6,13 +6,13 @@
 
 ``` shell
 # from $PROJECT_ROOT
-$ bb -m eval.links some args
+$ bb -m eval.venster some args
 
 # bbin install
-$ bbin install . --as links-dev
+$ bbin install . --as venster-dev
 
 # ...then in another project
-$ links-dev
+$ venster-dev
 ```
 
 ## NextUp
@@ -21,9 +21,17 @@ $ links-dev
 
 ## Links
 
-- [Project               ](https://github.com/eval/links)
-- [Commits current branch](https://github.com/eval/links/tree/{{branch|default:"main"}})
-- [My Issues             ](https://github.com/eval/links/issues{% if gh-handle %}/assigned/{{gh-handle}}{% endif %})
+- [Project               ](https://github.com/eval/venster)
+- [Commits current branch](https://github.com/eval/venster/tree/{{branch|default:"main"}})
+- [My Issues             ](https://github.com/eval/venster/issues{% if gh-handle %}/assigned/{{gh-handle}}{% endif %})
+- [Homebrew repository](https://github.com/eval/homebrew-brew)
+
+
+### Releases
+
+- [Stable](https://github.com/eval/venster/releases/tag/stable)
+- [Unstable](https://github.com/eval/venster/releases/tag/unstable)
+
 
 ## License
 
