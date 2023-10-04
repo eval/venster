@@ -102,9 +102,13 @@
 (defn- gl-handle []
   (or (System/getenv "VENSTER_GL_HANDLE") (git "config" "--get" "gitlab.user")))
 
+(defn- shell-env []
+  (into {} (System/getenv)))
+
 (def ^:private variables {:branch    #'current-branch
                           :gh-handle #'gh-handle
-                          :gl-handle #'gl-handle})
+                          :gl-handle #'gl-handle
+                          :env       #'shell-env})
 
 (defn- warn-on-unknown-variables! [tpl ks]
   (let [tpl-vars (selmer/known-variables tpl)]
