@@ -35,25 +35,33 @@ $ bbin install https://github.com/eval/venster/releases/download/stable/venster-
 
 ## Usage
 
-* Create a section '## Links' (any depth is ok) in the project's `README.md`
-* Add links :)  
-  Available values for [Selmer filters](https://github.com/yogthos/Selmer?tab=readme-ov-file#built-in-filters-1):
-  - `branch`  
-    Current git branch.
-  - `gh-handle`  
-    based on...
-    - git config github.user
-      Add via `git config --global github.user eval`
-    - env-var `VENSTER_GH_HANDLE`.
-  - `gl-handle`  
-    based on...
-    - git config gitlab.user
-      Add via `git config --global gitlab.user eval`
-    - env-var `VENSTER_GL_HANDLE`.
-* Invoking `venster` in any subfolder of the project will now render the links.
+1. Create a section '## Links' (any depth is ok) in the project's `README.md`
+1. Add links
+   Available values for [Selmer filters](https://github.com/yogthos/Selmer?tab=readme-ov-file#built-in-filters-1):  
+   - `env`  
+     e.g. `file:/{{ env.HOME }}/.vimrc`. Which is a link that your terminal can let you open with an editor.
+   - `current-branch`  
+     Current git branch, e.g. `https://github.com/eval/venster/actions?query=branch%3A{{ current-branch | default:"main" }}`.
+   - `github-user`  
+     e.g. `https://github.com/eval/venster/issues/assigned/{{ github-user }}`, or
+     to have a fallback when the value is not present: `https://github.com/eval/venster/issues{% if github-user %}/assigned/{{ github-user }}{% endif %}`.  
+     Determined via...  
+     - env-var `VENSTER_GITHUB_USER`.
+     - git config github.user  
+       Add via `git config --global github.user eval`
+   - `gitlab-user`  
+     Determined via...  
+     - env-var `VENSTER_GITLAB_USER`.
+     - git config gitlab.user  
+       Add via `git config --global gitlab.user eval`
+   - `readme-folder`  
+     Folder where `README.md` is located. Allows for pointing to project-files,  
+     e.g. `file://{{ readme-folder }}/.github/workflows/ci.yml`.  
+1. Invoking `venster` in any subfolder of the project will now render the links.
 
 ### Example
 
+Example Links-section in a `README.md` (see also the Links-section of this README):
 ```
 ## Links
 
@@ -61,12 +69,18 @@ $ bbin install https://github.com/eval/venster/releases/download/stable/venster-
 
 ### Pull Requests
 
-<!-- Pull Requests across multiple repositories assigned to user -->
-- [My PRs](https://github.com/pulls?q=is%3Apr+archived%3Afalse+repo%3Aeval%2Fmalli-select+repo%3Aeval%2Fdeps-try+is%3Aopen{% if gh-handle %}+assignee%3A{{ gh-handle }}+{% endif %})
+<!-- This comment won't be rendered.
+     Pull Requests across multiple repositories assigned to user with fallback in case there's no github-handle -->
+- [My PRs](https://github.com/pulls?q=is%3Apr+archived%3Afalse+repo%3Aeval%2Fmalli-select+repo%3Aeval%2Fdeps-try+is%3Aopen{% if github-handle %}+assignee%3A{{ github-handle }}+{% endif %})
 
 ### Builds
 
-- [Builds current branch](https://github.com/eval/venster/actions?query=branch%3A{{ branch|default:"main" }}) 
+- [Builds current branch](https://github.com/eval/venster/actions?query=branch%3A{{ current-branch | default:"main" }})
+- [Release workflow     ](file://{{ readme-folder }}/.github/workflows/release.yml)
+
+### API Docs
+
+- [Ruby docs](https://docs.ruby-lang.org/en/{{ env.RUBY_VERSION|drop-last:2|join }})
 ```
 
 ### Dev
@@ -82,22 +96,24 @@ $ bbin install . --as venster-dev
 $ venster-dev
 ```
 
-## NextUp
-
-- 
-
 ## Links
 
 - [Project               ](https://github.com/eval/venster)
-- [Current branch        ](https://github.com/eval/venster/tree/{{branch|default:"main"}})
-- [My Issues             ](https://github.com/eval/venster/issues{% if gh-handle %}/assigned/{{gh-handle}}{% endif %})
-- [Homebrew repository   ](https://github.com/eval/homebrew-brew)
+- [Current branch        ](https://github.com/eval/venster/tree/{{ current-branch | default:"main" }})
+- [My Issues             ](https://github.com/eval/venster/issues{% if github-user %}/assigned/{{ github-user }}{% endif %})
+- [My PRs                ](https://github.com/eval/venster/pulls{% if github-user %}/assigned/{{ github-user }}{% endif %})
+
+### Builds
+
+- [Builds current branch](https://github.com/eval/venster/actions?query=branch%3A{{ current-branch | default:"main" }})
+- [Release workflow     ](file://{{ readme-folder }}/.github/workflows/release.yml)
 
 
-### Releases
+### Releasing
 
 - [Stable](https://github.com/eval/venster/releases/tag/stable)
 - [Unstable](https://github.com/eval/venster/releases/tag/unstable)
+- [Homebrew repository   ](https://github.com/eval/homebrew-brew)
 
 > Clojure solves the problem that you don't know you have. -- Rich Hickey
 
