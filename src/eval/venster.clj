@@ -125,18 +125,33 @@
     (update-vals (filter (comp tpl-vars key) candidates)
                  #(apply % nil))))
 
-(defn -main [& _args]
-  (if-some [readme (some-> (find-up "README.md") fs/file)]
-    (when-seq [links-section (extract-links-section readme)]
-              (let [max-line-length (apply max (map count (string/split-lines links-section)))
-                    ctx-map         (context-map links-section variables)]
-                (warn-on-unknown-variables! links-section (keys variables))
-                (let [links (selmer/render links-section ctx-map)]
-                  (pipeline (pb "echo" links)
-                            (pb {:out :inherit}
-                                "glow" "-w" max-line-length)))))
-    (do (println "Could not find any README.md traversing up")
-        (System/exit 1))))
+(defn- print-version []
+  (let [dev?    (nil? (io/resource "VERSION"))
+        bin     (if dev? "venster-dev" "venster")
+        version (string/trim
+                 (if dev?
+                   (let [git-dir (find-up ".git/")]
+                     (git "--git-dir" (str git-dir) "describe" "--tags"))
+                   (slurp (io/resource "VERSION"))))]
+    (println (str bin " " version))))
+
+(defn- print-version? [args]
+  (contains? #{"-v" "--version" "version"} (first args)))
+
+(defn -main [& args]
+  (if (print-version? args)
+    (print-version)
+    (if-some [readme (some-> (find-up "README.md") fs/file)]
+      (when-seq [links-section (extract-links-section readme)]
+                (let [max-line-length (apply max (map count (string/split-lines links-section)))
+                      ctx-map         (context-map links-section variables)]
+                  (warn-on-unknown-variables! links-section (keys variables))
+                  (let [links (selmer/render links-section ctx-map)]
+                    (pipeline (pb "echo" links)
+                              (pb {:out :inherit}
+                                  "glow" "-w" max-line-length)))))
+      (do (println "Could not find any README.md traversing up")
+          (System/exit 1)))))
 
 (comment
 
