@@ -1,10 +1,20 @@
 (ns eval.links
+  {:clj-kondo/config '{:lint-as {eval.links/when-seq clojure.core/when-some}}}
   (:require [babashka.fs :as fs]
-            [babashka.process :refer [pipeline pb]]
+            [babashka.process :refer [pipeline pb process]]
             [clojure.java.io :as io]
-            [clojure.string :as string]))
+            [clojure.string :as string]
+            [selmer.parser :as selmer]))
 
-(defn find-up
+(defmacro when-seq
+  "Short for:
+  (when-some [non-empty (not-empty (possible-collection))]
+    ,,,)"
+  [binding & body]
+  `(when-some [~(binding 0) (not-empty ~(binding 1))] (do ~@body)))
+
+
+(defn- find-up
   "Starting in folder `start` and traversing up, either checks if the folder contains `to-find` (returning the file if it does) or, when `to-find` is an fn, returns the path of the first folder for which `to-find` returns logical true.
 
   - `to-find` - a string, file or path such as \"README.md\", \".\", (fs/path \"fs\") or a (fn accept [^java.nio.file.Path p]) -> truthy
@@ -63,7 +73,7 @@
                 (filter folder-filter-fn)
                 first)))))))
 
-(defn extract-links-section [file]
+(defn- extract-links-section [file]
   (->> file
        io/reader
        line-seq
@@ -78,9 +88,45 @@
        :result
        (string/join \newline)))
 
+(defn- git [& args]
+  (some-> (apply process "git" args) :out slurp string/trimr))
+
+(defn- current-branch []
+  (git "branch" "--show-current"))
+
+(defn- gh-handle []
+  (or (System/getenv "LINKS_GH_HANDLE") (git "config" "--get" "github.user")))
+
+(defn- gl-handle []
+  (or (System/getenv "LINKS_GL_HANDLE") (git "config" "--get" "gitlab.user")))
+
+(def ^:private variables {:branch    #'current-branch
+                          :gh-handle #'gh-handle
+                          :gl-handle #'gl-handle})
+
+(defn- warn-on-unknown-variables! [tpl ks]
+  (let [tpl-vars (selmer/known-variables tpl)]
+    (when-seq [unknown-vars (remove (set ks) tpl-vars)]
+      (println "WARNING Unknown template variables:" (prn-str unknown-vars)))))
+
+(defn- context-map [tpl candidates]
+  (let [tpl-vars (selmer/known-variables tpl)]
+    (update-vals (filter (comp tpl-vars key) candidates)
+                 #(apply % nil))))
+
 (defn -main [& _args]
   (if-some [readme (some-> (find-up "README.md") fs/file)]
-    (when-some [links (not-empty (extract-links-section readme))]
-      (pipeline (pb "echo" links) (pb {:out :inherit} "bat" "-l" "md" "--style=plain")))
+    (when-seq [links-section (extract-links-section readme)]
+      (let [ctx-map (context-map links-section variables)]
+        (warn-on-unknown-variables! links-section (keys variables))
+        (let [links (selmer/render links-section ctx-map)]
+          (pipeline (pb "echo" links)
+                    (pb {:out :inherit}
+                        "bat" "-l" "md" "--style=plain,header-filename" "--file-name" readme)))))
     (do (println "Could not find any README.md traversing up")
         (System/exit 1))))
+
+(comment
+
+
+  #_:end)

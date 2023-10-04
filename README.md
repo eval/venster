@@ -21,8 +21,9 @@ $ links-dev
 
 ## Links
 
-- [author](https://github.com/eval)
-- [project](https://github.com/eval/links)
+- [Project               ](https://github.com/eval/links)
+- [Commits current branch](https://github.com/eval/links/tree/{{branch|default:"main"}})
+- [My Issues             ](https://github.com/eval/links/issues{% if gh-handle %}/assigned/{{gh-handle}}{% endif %})
 
 ## License
 
