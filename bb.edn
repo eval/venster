@@ -1,3 +1,2 @@
-{:paths    ["src"]
- :bbin/bin {venster {:main-opts ["-m" "eval.venster"]}}
- :deps     {}}
+{:bbin/bin {venster {:main-opts ["-m" "eval.venster"]}}
+ :deps     {io.github.eval/venster {:local/root "."}}}
