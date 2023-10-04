@@ -6,6 +6,8 @@
             [clojure.string :as string]
             [selmer.parser :as selmer]))
 
+(def current-file *file*)
+
 (defmacro when-seq
   "Short for:
   (when-some [non-empty (not-empty (possible-collection))]
@@ -130,7 +132,7 @@
         bin     (if dev? "venster-dev" "venster")
         version (string/trim
                  (if dev?
-                   (let [git-dir (find-up ".git/")]
+                   (let [git-dir (find-up ".git/" current-file)]
                      (git "--git-dir" (str git-dir) "describe" "--tags"))
                    (slurp (io/resource "VERSION"))))]
     (println (str bin " " version))))
