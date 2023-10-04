@@ -8,7 +8,7 @@ CLI written in [Babashka](https://babashka.org/) to render the Links-section of 
 
 I started experimenting with having a Links-section in READMEs to quickly jump to places while developing: e.g. the project on GitHub, the issue list, the notifications, anything assigned to me but also any link to staging/production front- and backends.  
 A quick experiment with an awk-script, [glow](https://github.com/charmbracelet/glow) as a pager and iTerm, which makes urls easily clickable, showed it was indeed something useful that removed friction.  
-The current version allows for placeholders, i.e. making links more contextualized as they can contain the current branch and one's git(hub|lab) handle which makes it more suitable to use with a team.
+The current version allows for placeholders, i.e. making links more contextualized as they can contain the current branch, env-vars and one's git(hub|lab) handle which makes it more suitable to use with a team.
 
 
 ## Install
@@ -70,8 +70,8 @@ Example Links-section in a `README.md` (see also the Links-section of this READM
 ### Pull Requests
 
 <!-- This comment won't be rendered.
-     Pull Requests across multiple repositories assigned to user with fallback in case there's no github-handle -->
-- [My PRs](https://github.com/pulls?q=is%3Apr+archived%3Afalse+repo%3Aeval%2Fmalli-select+repo%3Aeval%2Fdeps-try+is%3Aopen{% if github-handle %}+assignee%3A{{ github-handle }}+{% endif %})
+     Pull Requests across multiple repositories assigned to user with fallback in case there's no github-user -->
+- [My PRs](https://github.com/pulls?q=is%3Apr+archived%3Afalse+repo%3Aeval%2Fmalli-select+repo%3Aeval%2Fdeps-try+is%3Aopen{% if github-user %}+assignee%3A{{ github-user }}+{% endif %})
 
 ### Builds
 
@@ -95,6 +95,10 @@ $ bbin install . --as venster-dev
 # ...then in another project
 $ venster-dev
 ```
+
+## Wishlist
+
+- ...
 
 ## Links
 

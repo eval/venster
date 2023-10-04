@@ -78,7 +78,7 @@
        io/reader
        line-seq
        (reduce (fn [{:keys [_result in-section?] :as acc} line]
-                 (let [section-ending? #(some->> %1 (re-find #"^(#+) ") second count (= %2))
+                 (let [section-ending?   #(some->> %1 (re-find #"^(#+) ") second count (= %2))
                        section-starting? #(some->> % (re-find #"^(#+) Links") second count)]
                    (if in-section?
                      (if (section-ending? line in-section?)
@@ -86,7 +86,8 @@
                        (update acc :result conj line))
                      (if-let [depth (section-starting? line)]
                        (assoc acc :in-section? depth :result ["# Links"])
-                       acc)))) {:result [] :in-section? false})
+                       acc))))
+               {:result [] :in-section? false})
        :result
        (string/join \newline)))
 
