@@ -1,2 +1,3 @@
 {:bbin/bin {venster {:main-opts ["-m" "eval.venster"]}}
- :deps     {io.github.eval/venster {:local/root "."}}}
+ :deps     {io.github.eval/venster {:local/root "."}}
+ :tasks    {lint (shell "clj-kondo --lint .")}}
